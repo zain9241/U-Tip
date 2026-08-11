@@ -15,7 +15,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter  U Tip App ',
       theme: ThemeData(
-
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
@@ -32,36 +31,109 @@ class UTip extends StatefulWidget {
 }
 
 class _UTipState extends State<UTip> {
+  late int _personCount = 1;
+
+  //Methods
+  void increment() {
+    setState(() {
+      _personCount += 1;
+    });
+  }
+
+  void decrement() {
+    setState(() {
+      if (_personCount >1) {
+        _personCount--;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (kDebugMode) {
       print(context.widget);
     }
     var theme = Theme.of(context);
+    // Add Style
+    final style = theme.textTheme.titleMedium!.copyWith(
+      color: theme.colorScheme.onPrimary,
+      fontWeight: FontWeight.bold,
+    );
     return Scaffold(
-      appBar: AppBar(
-        title: Center(child: const Text("Flutter U Tip App")),
-      ),
-      body:Column(
+      appBar: AppBar(title: Center(child: const Text("Flutter U Tip App"))),
+      body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(20),
+            margin: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: theme.colorScheme.inversePrimary,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
               children: [
-                Text(" Total Per Person  ",
-                  style: theme.textTheme.titleMedium ,
+                Text(" Total Per Person  ", style: style),
+                Text(
+                  " \$ 20.98  ",
+                  style: style.copyWith(
+                    color: theme.colorScheme.onPrimary,
+                    fontSize: theme.textTheme.displaySmall?.fontSize,
+                  ),
                 ),
-                 Text(" \$ 20.98  " ,
-                style:Theme.of(context).textTheme.displaySmall ,
-                ),
-
               ],
-            ), ),
+            ),
+          ),
+          // Form
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              margin: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: .circular(5),
+                border: Border.all(
+                  color: theme.colorScheme.inversePrimary,
+                  width: 2,
+                ),
+              ),
+              child: Column(
+                children: [
+                  TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.attach_money),
+                      labelText: "Bill Amount ",
+                    ),
+                    keyboardType: TextInputType.number,
+                    onChanged: (String value) {},
+                  ),
+                  //Split Bill Area
+                  Row(
+                    mainAxisAlignment: .spaceBetween,
+                    children: [
+                      Text("Split ", style: theme.textTheme.titleLarge),
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: decrement,
+                            icon: Icon(Icons.remove),
+                          ),
+                          Text(
+                            "$_personCount",
+                            style: theme.textTheme.titleMedium,
+                          ),
+                          IconButton(
+                            onPressed: increment,
+                            icon: Icon(Icons.add),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
