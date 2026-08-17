@@ -8,14 +8,13 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter  U Tip App ',
+      title: 'Flutter U Tip App',
       theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const UTip(),
@@ -31,18 +30,24 @@ class UTip extends StatefulWidget {
 }
 
 class _UTipState extends State<UTip> {
-  late int _personCount = 1;
+  double _billAmount = 0;
+  double _tipPercentage = 0;
+  int _personCount = 1;
 
-  //Methods
-  void increment() {
+  double get _totalPerPerson {
+    final total = _billAmount + (_billAmount * _tipPercentage);
+    return total / _personCount;
+  }
+
+  void _increment() {
     setState(() {
       _personCount += 1;
     });
   }
 
-  void decrement() {
+  void _decrement() {
     setState(() {
-      if (_personCount >1) {
+      if (_personCount > 1) {
         _personCount--;
       }
     });
@@ -54,28 +59,27 @@ class _UTipState extends State<UTip> {
       print(context.widget);
     }
     var theme = Theme.of(context);
-    // Add Style
     final style = theme.textTheme.titleMedium!.copyWith(
       color: theme.colorScheme.onPrimary,
       fontWeight: FontWeight.bold,
     );
     return Scaffold(
-      appBar: AppBar(title: Center(child: const Text("Flutter U Tip App"))),
+      appBar: AppBar(title: const Center(child: Text("Flutter U Tip App"))),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            margin: EdgeInsets.all(10),
+            margin: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: theme.colorScheme.inversePrimary,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
               children: [
-                Text(" Total Per Person  ", style: style),
+                Text("Total Per Person", style: style),
                 Text(
-                  " \$ 20.98  ",
+                  "\$ ${_totalPerPerson.toStringAsFixed(2)}",
                   style: style.copyWith(
                     color: theme.colorScheme.onPrimary,
                     fontSize: theme.textTheme.displaySmall?.fontSize,
@@ -86,51 +90,85 @@ class _UTipState extends State<UTip> {
           ),
           // Form
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(10),
             child: Container(
-              margin: EdgeInsets.all(10),
+              margin: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                borderRadius: .circular(5),
+                borderRadius: BorderRadius.circular(5),
                 border: Border.all(
                   color: theme.colorScheme.inversePrimary,
                   width: 2,
                 ),
               ),
-              child: Column(
-                children: [
-                  TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.attach_money),
-                      labelText: "Bill Amount ",
-                    ),
-                    keyboardType: TextInputType.number,
-                    onChanged: (String value) {},
-                  ),
-                  //Split Bill Area
-                  Row(
-                    mainAxisAlignment: .spaceBetween,
-                    children: [
-                      Text("Split ", style: theme.textTheme.titleLarge),
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: decrement,
-                            icon: Icon(Icons.remove),
-                          ),
-                          Text(
-                            "$_personCount",
-                            style: theme.textTheme.titleMedium,
-                          ),
-                          IconButton(
-                            onPressed: increment,
-                            icon: Icon(Icons.add),
-                          ),
-                        ],
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    TextField(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.attach_money),
+                        labelText: "Bill Amount",
                       ),
-                    ],
-                  ),
-                ],
+                      keyboardType: TextInputType.number,
+                      onChanged: (String value) {
+                        setState(() {
+                          _billAmount = double.tryParse(value) ?? 0;
+                        });
+                      },
+                    ),
+                    // Split Bill Area
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Split", style: theme.textTheme.titleLarge),
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: _decrement,
+                              icon: const Icon(Icons.remove),
+                            ),
+                            Text(
+                              "$_personCount",
+                              style: theme.textTheme.titleMedium,
+                            ),
+                            IconButton(
+                              onPressed: _increment,
+                              icon: const Icon(Icons.add),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    // == Tip Section ==
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Tip", style: theme.textTheme.titleMedium),
+                        Text(
+                          "\$ ${(_billAmount * _tipPercentage).toStringAsFixed(2)}",
+                          style: theme.textTheme.titleMedium,
+                        ),
+                      ],
+                    ),
+                    // === Slider Text ===
+                    Text(
+                      "${(_tipPercentage * 100).toStringAsFixed(0)}%",
+                      style: theme.textTheme.titleLarge,
+                    ),
+                    Slider(
+                      value: _tipPercentage,
+                      min: 0,
+                      max: 1,
+                      label: "${(_tipPercentage*100).round()}%",
+                      onChanged: (value) {
+                        setState(() {
+                          _tipPercentage = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
